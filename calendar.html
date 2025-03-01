@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>Calendar Events Manager</title> 
+
+  
+  <style>
+   
+    body {
+      font-family: Arial, sans-serif; 
+      background-color:  blueviolet; 
+      margin: 0; 
+      padding: 20px; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+    }
+
+   
+    h1 {
+      color: #333; 
+    }
+
+   
+    .container {
+      background: white; 
+      padding: 20px;
+      border-radius: 8px; 
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+      width: 100%; 
+      max-width: 600px; 
+    }
+
+   
+    .form-group {
+      margin-bottom: 15px; 
+    }
+
+ 
+    .form-group label {
+      display: block; 
+      margin-bottom: 5px; 
+      font-weight: bold; 
+    }
+
+    
+    .form-group input {
+      width: 100%; 
+      padding: 8px; 
+      border: 1px solid #ccc;
+      border-radius: 4px; 
+    }
+
+   
+    .form-group button {
+      padding: 10px 15px; 
+      background-color: whitesmoke; 
+      color: black; 
+      border: none; 
+      border-radius: 4px; 
+      cursor: pointer; 
+    }
+
+  
+    .form-group button:hover {
+      background-color: lightgray; 
+    }
+
+   
+    .events-table {
+      width: 100%;
+      border-collapse: collapse; 
+      margin-top: 20px; 
+    }
+
+   
+    .events-table th,
+    .events-table td {
+      padding: 10px;
+      border: 1px solid #ddd; 
+      text-align: left; 
+    }
+
+ 
+    .events-table th {
+      background-color: #f8f9fa;
+    }
+
+    .events-table tr:hover {
+      background-color: #f1f1f1;
+    }
+
+   
+    .delete-btn {
+      background-color: blueviolet; 
+      color: white; 
+      border: none; 
+      padding: 5px 10px; 
+      border-radius: 4px; 
+      cursor: pointer; 
+    }
+
+   
+    .delete-btn:hover {
+      background-color: magenta; 
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="container">
+  
+    <h1>Calendar Events Manager</h1>
+    
+    <div class="form-group">
+      <label for="eventTitle">Event Title</label>
+      <input type="text" id="eventTitle" placeholder="Enter event title">
+    </div>
+    <div class="form-group">
+      <label for="eventDate">Event Date</label>
+      <input type="date" id="eventDate">
+    </div>
+    <div class="form-group">
+      <label for="eventLocation">Event Location</label>
+      <input type="text" id="eventLocation" placeholder="Enter event location">
+    </div>
+    <div class="form-group">
+     
+      <button onclick="addEvent()">Add Event</button>
+    </div>
+
+    
+    <table class="events-table">
+      <thead>
+        <tr>
+          <th>Title</th> 
+          <th>Date</th> 
+          <th>Location</th> 
+          <th>Actions</th> 
+        </tr>
+      </thead>
+      <tbody id="eventList">
+      
+      </tbody>
+    </table>
+  </div>
+
+  
+  <script>
+  
+
+    let myevents = [
+      {title: "web development master class", 
+        date: new Date("2025-02-28"),
+        location: "Lavington",
+        attendees: new Set(["lornah"])
+      },
+      {
+        title: "wedding after party",
+        date: new Date ("2025-03-01"),
+        location: "Kiambu",
+        attendees: new Set (["Ian"])
+      },
+      {
+        title: "Graduation",
+        date: new Date ("2025-03-08"),
+        location: "Gatanga",
+        attendees: new Set (["Shelby"])
+      },
+      {
+        title: "Birthday Party",
+        date: new Date ("2025-03-10"),
+        location: "Ruiru",
+        attendees: new Set (["Mary"])
+      }
+    ]
+   
+    function addEvent() {
+   
+      let title = document.getElementById("eventTitle").value;
+      let date = document.getElementById("eventDate").value;
+      let location = document.getElementById("eventLocation").value;
+
+      if (!title || !date || !location) {
+        alert("Please fill in all fields."); 
+        return;
+      }
+
+     
+      const newEvent = {
+        title,
+        date: new Date(date), 
+        location,
+        attendees: new Set(), 
+      };
+
+      
+      events.push(newEvent);
+
+     
+      renderEvents();
+      clearForm();
+    }
+
+    function deleteEvent(index) {
+      
+      events.splice(index, 1);
+
+     
+      renderEvents();
+    }
+
+    
+    function renderEvents() {
+      const eventList = document.getElementById("eventList");
+      eventList.innerHTML = ""; 
+
+     
+      myevents.forEach((event, index) => {
+        const row = document.createElement("tr"); 
+        row.innerHTML = `
+          <td>${event.title}</td> <!-- Event title -->
+          <td>${event.date.toLocaleDateString()}</td> <!-- Formatted event date -->
+          <td>${event.location}</td> <!-- Event location -->
+          <td>
+            <!-- Delete button with onclick event to delete the event -->
+            <button class="delete-btn" onclick="deleteEvent(${index})">Delete</button>
+          </td>
+        `;
+        eventList.appendChild(row);
+      });
+    }
+
+   
+    function clearForm() {
+      document.getElementById("eventTitle").value = ""; 
+      document.getElementById("eventDate").value = ""; 
+      document.getElementById("eventLocation").value = ""; 
+    }
+
+   
+    renderEvents();
+  </script>
+</body>
+</html>
