@@ -1,99 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- 
-  <meta charset="UTF-8"> 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <meta charset="UTF-8" /> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
   <title>Calendar Events Manager</title> 
-
-  
   <style>
-   
     body {
       font-family: Arial, sans-serif; 
-      background-color:  blueviolet; 
+      background-color: lavender; 
       margin: 0; 
       padding: 20px; 
       display: flex; 
       flex-direction: column; 
-      align-items: center; 
+      align-items: center;
     }
-
-   
-    h1 {
-      color: #333; 
+    h1, h2 {
+      color: #333;
     }
-
-   
     .container {
       background: white; 
       padding: 20px;
       border-radius: 8px; 
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
       width: 100%; 
-      max-width: 600px; 
+      max-width: 800px;
+      margin-bottom: 20px;
     }
-
-   
     .form-group {
       margin-bottom: 15px; 
     }
-
- 
     .form-group label {
       display: block; 
       margin-bottom: 5px; 
       font-weight: bold; 
     }
-
-    
+    .form-group select,
     .form-group input {
       width: 100%; 
       padding: 8px; 
       border: 1px solid #ccc;
       border-radius: 4px; 
     }
-
-   
-    .form-group button {
+    .form-group button, button {
       padding: 10px 15px; 
-      background-color: whitesmoke; 
+      background-color: rgb(163, 122, 202); 
       color: black; 
       border: none; 
       border-radius: 4px; 
       cursor: pointer; 
     }
-
-  
-    .form-group button:hover {
+    .form-group button:hover, button:hover {
       background-color: lightgray; 
     }
-
-   
     .events-table {
       width: 100%;
       border-collapse: collapse; 
       margin-top: 20px; 
     }
-
-   
     .events-table th,
     .events-table td {
       padding: 10px;
       border: 1px solid #ddd; 
       text-align: left; 
     }
-
- 
     .events-table th {
-      background-color: #f8f9fa;
+      background-color: lavender;
     }
-
     .events-table tr:hover {
       background-color: #f1f1f1;
     }
-
-   
     .delete-btn {
       background-color: blueviolet; 
       color: white; 
@@ -102,147 +77,269 @@
       border-radius: 4px; 
       cursor: pointer; 
     }
-
-   
     .delete-btn:hover {
       background-color: magenta; 
+    }
+ 
+    .filter-section, .attendee-section {
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: 100%;
+      max-width: 800px;
+      background: white;
+    }
+    .filter-section label, .attendee-section label {
+      margin-bottom: 3px;
+    }
+    .filter-section button {
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  
-  <div class="container">
-  
-    <h1>Calendar Events Manager</h1>
-    
-    <div class="form-group">
-      <label for="eventTitle">Event Title</label>
-      <input type="text" id="eventTitle" placeholder="Enter event title">
-    </div>
-    <div class="form-group">
-      <label for="eventDate">Event Date</label>
-      <input type="date" id="eventDate">
-    </div>
-    <div class="form-group">
-      <label for="eventLocation">Event Location</label>
-      <input type="text" id="eventLocation" placeholder="Enter event location">
-    </div>
-    <div class="form-group">
-     
-      <button onclick="addEvent()">Add Event</button>
-    </div>
+  <h1>Calendar Events Manager</h1>
 
-    
+
+  <div class="filter-section container">
+    <h2>Filter Upcoming Events</h2>
+    <div class="form-group">
+      <label for="filterType">Filter by Event Type:</label>
+      <select id="filterType">
+        <option value="All">All</option>
+        <option value="Workshop">Workshop</option>
+        <option value="Party">Party</option>
+        <option value="Ceremony">Ceremony</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="filterPriority">Filter by Priority:</label>
+      <select id="filterPriority">
+        <option value="All">All</option>
+        <option value="High">High</option>
+        <option value="Medium">Medium</option>
+        <option value="Low">Low</option>
+      </select>
+    </div>
+    <button onclick="renderUpcomingEvents(); renderMostAttendeesEvent();">Apply Filters</button>
+  </div>
+
+ 
+  <div class="container">
+    <h2>All Events</h2>
     <table class="events-table">
       <thead>
         <tr>
           <th>Title</th> 
           <th>Date</th> 
           <th>Location</th> 
-          <th>Actions</th> 
+          <th>Type</th>
+          <th>Priority</th>
+          <th>Host</th>
+          <th>Attendees (Current/Max)</th>
+          <th>Actions</th>
         </tr>
       </thead>
-      <tbody id="eventList">
-      
+      <tbody id="allEventList">
+       
       </tbody>
     </table>
   </div>
 
-  
+
+  <div class="container">
+    <h2>Upcoming Events</h2>
+    <table class="events-table">
+      <thead>
+        <tr>
+          <th>Title</th> 
+          <th>Date</th> 
+          <th>Location</th> 
+          <th>Type</th>
+          <th>Priority</th>
+          <th>Host</th>
+          <th>Attendees (Current/Max)</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="upcomingEventList">
+     
+      </tbody>
+    </table>
+  </div>
+
+
+  <div class="attendee-section container">
+    <h2>Add Attendee</h2>
+    <div class="form-group">
+      <label for="selectEvent">Select Event:</label>
+      <select id="selectEvent">
+       
+      </select>
+    </div>
+   
+    <button onclick="addAttendee()">Add Attendee</button>
+  </div>
+
+ 
+  <div class="container" id="mostAttendeesSection">
+    <h2>Event With Most Attendees</h2>
+    <div id="mostAttendeesEvent">
+      
+    </div>
+  </div>
+
   <script>
-  
-
+   
+   
     let myevents = [
-      {title: "web development master class", 
+      {
+        title: "Web Development Master Class",
         date: new Date("2025-02-28"),
-        location: "Lavington",
-        attendees: new Set(["lornah"])
+        location: "Kamakis",
+        type: "Workshop",
+        priority: "High",
+        host: "Lornah",
+        maxAttendees: 50,
+        currentAttendees: 10
       },
       {
-        title: "wedding after party",
-        date: new Date ("2025-03-01"),
-        location: "Kiambu",
-        attendees: new Set (["Ian"])
+        title: "Wedding After Party",
+        date: new Date("2025-03-01"),
+        location: "Nyeri",
+        type: "Party",
+        priority: "Medium",
+        host: "Ian",
+        maxAttendees: 100,
+        currentAttendees: 30
       },
       {
-        title: "Graduation",
-        date: new Date ("2025-03-08"),
-        location: "Gatanga",
-        attendees: new Set (["Shelby"])
-      },
-      {
-        title: "Birthday Party",
-        date: new Date ("2025-03-10"),
-        location: "Ruiru",
-        attendees: new Set (["Mary"])
+        title: "Graduation Ceremony",
+        date: new Date("2025-03-08"),
+        location: "Bungoma",
+        type: "Ceremony",
+        priority: "Low",
+        host: "Shelby",
+        maxAttendees: 200,
+        currentAttendees: 20
       }
-    ]
-   
-    function addEvent() {
-   
-      let title = document.getElementById("eventTitle").value;
-      let date = document.getElementById("eventDate").value;
-      let location = document.getElementById("eventLocation").value;
+    ];
 
-      if (!title || !date || !location) {
-        alert("Please fill in all fields."); 
-        return;
-      }
-
-     
-      const newEvent = {
-        title,
-        date: new Date(date), 
-        location,
-        attendees: new Set(), 
-      };
-
-      
-      events.push(newEvent);
-
-     
-      renderEvents();
-      clearForm();
-    }
-
-    function deleteEvent(index) {
-      
-      events.splice(index, 1);
-
-     
-      renderEvents();
-    }
-
-    
-    function renderEvents() {
-      const eventList = document.getElementById("eventList");
-      eventList.innerHTML = ""; 
-
-     
-      myevents.forEach((event, index) => {
-        const row = document.createElement("tr"); 
+ 
+    function renderAllEvents() {
+      const allEventList = document.getElementById("allEventList");
+      allEventList.innerHTML = "";
+      myevents.forEach((event, i) => {
+        const row = document.createElement("tr");
         row.innerHTML = `
-          <td>${event.title}</td> <!-- Event title -->
-          <td>${event.date.toLocaleDateString()}</td> <!-- Formatted event date -->
-          <td>${event.location}</td> <!-- Event location -->
-          <td>
-            <!-- Delete button with onclick event to delete the event -->
-            <button class="delete-btn" onclick="deleteEvent(${index})">Delete</button>
-          </td>
+          <td>${event.title}</td>
+          <td>${event.date.toLocaleDateString()}</td>
+          <td>${event.location}</td>
+          <td>${event.type}</td>
+          <td>${event.priority}</td>
+          <td>${event.host}</td>
+          <td>${event.currentAttendees} / ${event.maxAttendees}</td>
+          <td><button class="delete-btn" onclick="deleteEvent(${i})">Delete</button></td>
         `;
-        eventList.appendChild(row);
+        allEventList.appendChild(row);
       });
     }
 
    
-    function clearForm() {
-      document.getElementById("eventTitle").value = ""; 
-      document.getElementById("eventDate").value = ""; 
-      document.getElementById("eventLocation").value = ""; 
+    function renderUpcomingEvents() {
+      const upcomingEventList = document.getElementById("upcomingEventList");
+      upcomingEventList.innerHTML = "";
+      const today = new Date();
+      const filterType = document.getElementById("filterType").value;
+      const filterPriority = document.getElementById("filterPriority").value;
+      
+      myevents.forEach((event, i) => {
+        if (event.date >= today) {
+          if ((filterType === "All" || event.type === filterType) &&
+              (filterPriority === "All" || event.priority === filterPriority)) {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${event.title}</td>
+              <td>${event.date.toLocaleDateString()}</td>
+              <td>${event.location}</td>
+              <td>${event.type}</td>
+              <td>${event.priority}</td>
+              <td>${event.host}</td>
+              <td>${event.currentAttendees} / ${event.maxAttendees}</td>
+              <td><button class="delete-btn" onclick="deleteEvent(${i})">Delete</button></td>
+            `;
+            upcomingEventList.appendChild(row);
+          }
+        }
+      });
     }
 
-   
-    renderEvents();
+  
+    function populateEventDropdown() {
+      const selectEvent = document.getElementById("selectEvent");
+      selectEvent.innerHTML = "";
+      myevents.forEach((event, i) => {
+        const option = document.createElement("option");
+        option.value = i;
+        option.textContent = event.title;
+        selectEvent.appendChild(option);
+      });
+    }
+
+  
+    function deleteEvent(index) {
+      myevents.splice(index, 1);
+      renderAllEvents();
+      renderUpcomingEvents();
+      populateEventDropdown();
+      renderMostAttendeesEvent();
+    }
+
+  
+    function addAttendee() {
+      const selectEvent = document.getElementById("selectEvent");
+      const selectedIndex = selectEvent.value;
+      const event = myevents[selectedIndex];
+      if (event.currentAttendees >= event.maxAttendees) {
+        alert("This event has reached the maximum number of attendees.");
+        return;
+      }
+      event.currentAttendees++;
+      renderAllEvents();
+      renderUpcomingEvents();
+      renderMostAttendeesEvent();
+    }
+
+
+    function renderMostAttendeesEvent() {
+      const container = document.getElementById("mostAttendeesEvent");
+      if (myevents.length === 0) {
+        container.innerHTML = "<p>No events available.</p>";
+        return;
+      }
+      let maxEvent = myevents[0];
+      for (let event of myevents) {
+        if (event.currentAttendees > maxEvent.currentAttendees) {
+          maxEvent = event;
+        }
+      }
+      container.innerHTML = `
+        <p><strong>Title:</strong> ${maxEvent.title}</p>
+        <p><strong>Date:</strong> ${maxEvent.date.toLocaleDateString()}</p>
+        <p><strong>Location:</strong> ${maxEvent.location}</p>
+        <p><strong>Type:</strong> ${maxEvent.type}</p>
+        <p><strong>Priority:</strong> ${maxEvent.priority}</p>
+        <p><strong>Host:</strong> ${maxEvent.host}</p>
+        <p><strong>Attendees:</strong> ${maxEvent.currentAttendees} / ${maxEvent.maxAttendees}</p>
+      `;
+    }
+
+ 
+    renderAllEvents();
+    renderUpcomingEvents();
+    populateEventDropdown();
+    renderMostAttendeesEvent();
   </script>
 </body>
 </html>
